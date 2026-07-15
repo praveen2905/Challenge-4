@@ -17,8 +17,12 @@ const activityLogSchema = new mongoose.Schema({
   zone: { type: String, default: null },
   severity: { type: String, default: null },
   userId: { type: String, default: null },
-  timestamp: { type: Date, default: Date.now },
+  timestamp: { type: Date, default: Date.now, index: true },
 });
+
+// Indexes for performance
+activityLogSchema.index({ timestamp: -1 });
+activityLogSchema.index({ type: 1 });
 
 activityLogSchema.set("toJSON", {
   transform(_doc, ret) {

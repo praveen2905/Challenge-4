@@ -31,14 +31,14 @@ function StatCounter({ target, label }) {
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden flex flex-col relative">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[150px] pointer-events-none" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      <div aria-hidden="true" className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+      <div aria-hidden="true" className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[150px] pointer-events-none" />
 
       <header className="w-full border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Activity className="h-6 w-6 text-primary" />
+          <div className="flex items-center gap-2" aria-label="VenueIQ">
+            <Activity className="h-6 w-6 text-primary" aria-hidden="true" />
             <span className="text-xl font-bold tracking-tight text-white">
               Venue<span className="text-primary">IQ</span>
             </span>
@@ -62,8 +62,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="max-w-4xl mx-auto"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8" role="status" aria-label="Live Event Mission Control">
+              <span aria-hidden="true" className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
               Live Event Mission Control
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-8 leading-tight">

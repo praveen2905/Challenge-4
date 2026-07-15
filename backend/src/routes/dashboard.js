@@ -11,8 +11,8 @@ const router = Router();
 router.get("/stats", authenticate, async (_req, res) => {
   try {
     const [zones, alerts, volunteers, chatSessions] = await Promise.all([
-      CrowdZone.find(),
-      Alert.find({ status: "active" }),
+      CrowdZone.find({}, "zoneId count capacity level densityPercent"),
+      Alert.find({ status: "active" }, "id status severity"),
       User.countDocuments({ role: "volunteer" }),
       ChatMessage.distinct("userId"),
     ]);
@@ -46,7 +46,7 @@ router.get("/stats", authenticate, async (_req, res) => {
 
 router.get("/activity", authenticate, async (_req, res) => {
   try {
-    const activities = await ActivityLog.find()
+    const activities = await ActivityLog.find({}, "type message zone severity timestamp")
       .sort({ timestamp: -1 })
       .limit(20);
     res.json(activities.map((a) => a.toJSON()));

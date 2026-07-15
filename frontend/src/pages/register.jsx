@@ -54,43 +54,94 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 py-12 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-md z-10">
         <div className="flex flex-col items-center mb-8">
-          <div className="h-16 w-16 bg-card border border-border rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-accent/20">
-            <Activity className="h-8 w-8 text-accent" />
+          <div className="h-16 w-16 bg-card border border-border rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-accent/20" aria-hidden="true">
+            <Activity className="h-8 w-8 text-accent" aria-hidden="true" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Create Access Badge</h1>
           <p className="text-muted-foreground mt-2">Register for the VenueIQ platform</p>
         </div>
 
         <div className="bg-card border border-card-border rounded-3xl p-8 shadow-2xl backdrop-blur-sm">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate aria-label="Registration form">
             <div className="space-y-2">
-              <Label className="text-foreground">Full Name</Label>
-              <Input placeholder="John Doe" className="bg-background border-border h-11" {...register("name")} />
-              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+              <Label htmlFor="register-name" className="text-foreground">Full Name</Label>
+              <Input
+                id="register-name"
+                placeholder="John Doe"
+                className="bg-background border-border h-11"
+                aria-required="true"
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? "register-name-error" : undefined}
+                autoComplete="name"
+                {...register("name")}
+              />
+              <div aria-live="assertive">
+                {errors.name && (
+                  <p id="register-name-error" role="alert" className="text-sm text-destructive mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label className="text-foreground">Email</Label>
-              <Input placeholder="operator@venueiq.com" className="bg-background border-border h-11" {...register("email")} />
-              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+              <Label htmlFor="register-email" className="text-foreground">Email</Label>
+              <Input
+                id="register-email"
+                type="email"
+                placeholder="operator@venueiq.com"
+                className="bg-background border-border h-11"
+                aria-required="true"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "register-email-error" : undefined}
+                autoComplete="email"
+                {...register("email")}
+              />
+              <div aria-live="assertive">
+                {errors.email && (
+                  <p id="register-email-error" role="alert" className="text-sm text-destructive mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label className="text-foreground">Password</Label>
-              <Input type="password" placeholder="••••••••" className="bg-background border-border h-11" {...register("password")} />
-              {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+              <Label htmlFor="register-password" className="text-foreground">Password</Label>
+              <Input
+                id="register-password"
+                type="password"
+                placeholder="••••••••"
+                className="bg-background border-border h-11"
+                aria-required="true"
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? "register-password-error" : undefined}
+                autoComplete="new-password"
+                {...register("password")}
+              />
+              <div aria-live="assertive">
+                {errors.password && (
+                  <p id="register-password-error" role="alert" className="text-sm text-destructive mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-foreground">Role</Label>
-                <Select value={role} onValueChange={(v) => { setRole(v); setValue("role", v); }}>
-                  <SelectTrigger className="bg-background border-border h-11">
+                <Label htmlFor="register-role" className="text-foreground">Role</Label>
+                <Select
+                  value={role}
+                  onValueChange={(v) => { setRole(v); setValue("role", v); }}
+                  name="role"
+                >
+                  <SelectTrigger id="register-role" className="bg-background border-border h-11" aria-label="Select your role">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
@@ -104,9 +155,13 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-foreground">Language</Label>
-                <Select value={language} onValueChange={(v) => { setLanguage(v); setValue("language", v); }}>
-                  <SelectTrigger className="bg-background border-border h-11">
+                <Label htmlFor="register-language" className="text-foreground">Language</Label>
+                <Select
+                  value={language}
+                  onValueChange={(v) => { setLanguage(v); setValue("language", v); }}
+                  name="language"
+                >
+                  <SelectTrigger id="register-language" className="bg-background border-border h-11" aria-label="Select your preferred language">
                     <SelectValue placeholder="Select language" />
                   </SelectTrigger>
                   <SelectContent>
@@ -127,11 +182,12 @@ export default function RegisterPage() {
               className="w-full h-12 text-lg font-medium mt-6"
               disabled={registerMutation.isPending}
               data-testid="button-register-submit"
+              aria-busy={registerMutation.isPending}
             >
               {registerMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Creating Badge...
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+                  <span>Creating Badge...</span>
                 </>
               ) : (
                 "Create Access Badge"

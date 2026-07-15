@@ -29,6 +29,10 @@ const alertSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Indexes for performance
+alertSchema.index({ status: 1, severity: -1 });
+alertSchema.index({ createdAt: -1 });
+
 alertSchema.set("toJSON", {
   transform(_doc, ret) {
     ret.id = ret._id?.toString();

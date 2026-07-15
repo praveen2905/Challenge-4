@@ -56,7 +56,7 @@ router.post("/login", async (req, res) => {
     }
     const { email, password } = parsed.data;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -75,7 +75,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/me", authenticate, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select("-password");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }

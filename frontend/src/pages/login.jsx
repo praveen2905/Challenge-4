@@ -43,51 +43,75 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-md z-10">
         <div className="flex flex-col items-center mb-8">
-          <div className="h-16 w-16 bg-card border border-border rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary/20">
-            <Activity className="h-8 w-8 text-primary" />
+          <div className="h-16 w-16 bg-card border border-border rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary/20" aria-hidden="true">
+            <Activity className="h-8 w-8 text-primary" aria-hidden="true" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Sign in to VenueIQ</h1>
           <p className="text-muted-foreground mt-2">Enter your credentials to access the command center</p>
         </div>
 
         <div className="bg-card border border-card-border rounded-3xl p-8 shadow-2xl backdrop-blur-sm">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate aria-label="Sign in form">
             <div className="space-y-2">
-              <Label className="text-foreground">Email</Label>
+              <Label htmlFor="login-email" className="text-foreground">Email</Label>
               <Input
+                id="login-email"
+                type="email"
                 placeholder="operator@venueiq.com"
                 className="bg-background border-border h-12"
                 data-testid="input-email"
+                aria-required="true"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "login-email-error" : undefined}
+                autoComplete="email"
                 {...register("email")}
               />
-              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+              <div aria-live="assertive">
+                {errors.email && (
+                  <p id="login-email-error" role="alert" className="text-sm text-destructive mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground">Password</Label>
+              <Label htmlFor="login-password" className="text-foreground">Password</Label>
               <Input
+                id="login-password"
                 type="password"
                 placeholder="••••••••"
                 className="bg-background border-border h-12"
                 data-testid="input-password"
+                aria-required="true"
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? "login-password-error" : undefined}
+                autoComplete="current-password"
                 {...register("password")}
               />
-              {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+              <div aria-live="assertive">
+                {errors.password && (
+                  <p id="login-password-error" role="alert" className="text-sm text-destructive mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
             </div>
             <Button
               type="submit"
               className="w-full h-12 text-lg font-medium"
               disabled={loginMutation.isPending}
               data-testid="button-login-submit"
+              aria-busy={loginMutation.isPending}
             >
               {loginMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Authenticating...
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+                  <span>Authenticating...</span>
                 </>
               ) : (
                 "Sign In"

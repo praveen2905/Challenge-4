@@ -6,6 +6,9 @@ import router from "./routes/index.js";
 
 const app = express();
 
+// Trust proxy for accurate IP-based rate limiting behind Vercel/load balancer
+app.set("trust proxy", 1);
+
 // Security headers
 app.use(
   helmet({
@@ -19,11 +22,12 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? (process.env.ALLOWED_ORIGINS || "").split(",").filter(Boolean)
+        ? (process.env.ALLOWED_ORIGINS || "").split(",").map(o => o.trim()).filter(Boolean)
         : true,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204,
   })
 );
 
@@ -67,7 +71,13 @@ app.use("/api", router);
 // Global error handler
 app.use((err, _req, res, _next) => {
   console.error("Unhandled error:", err);
-  res.status(500).json({ error: "Internal server error", message: err.message });
+  const statusCode = err.status || err.statusCode || 500;
+  res.status(statusCode).json({ error: "Internal server error", message: err.message });
+});
+
+// 404 catch-all for unmatched routes
+app.use((_req, res) => {
+  res.status(404).json({ error: "Not Found", message: "The requested resource does not exist." });
 });
 
 export default app;
