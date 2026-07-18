@@ -236,7 +236,7 @@ export default function DashboardPage() {
             ) : (
               activity.map((a, i) => (
                 <motion.div
-                  key={a._id || i}
+                  key={a.id || a._id || i}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.03 }}
@@ -295,6 +295,7 @@ export default function DashboardPage() {
               <Progress
                 value={zone.densityPercent}
                 className="h-1.5 mb-2 bg-muted"
+                indicatorClassName={LEVEL_BAR[zone.level] || "bg-primary"}
               />
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>{zone.count.toLocaleString()} / {zone.capacity.toLocaleString()}</span>

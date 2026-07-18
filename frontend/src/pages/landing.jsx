@@ -4,6 +4,7 @@ import { Activity, ShieldAlert, Navigation, Languages, BrainCircuit } from "luci
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import gsap from "gsap";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 function StatCounter({ target, label }) {
   const [value, setValue] = useState(0);
@@ -29,6 +30,7 @@ function StatCounter({ target, label }) {
 }
 
 export default function LandingPage() {
+  useDocumentTitle("Home");
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden flex flex-col relative">
       <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />

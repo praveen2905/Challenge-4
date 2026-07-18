@@ -1,12 +1,14 @@
 import mongoose from "mongoose";
 
 const chatMessageSchema = new mongoose.Schema({
-  userId: { type: String, required: true, index: true },
+  userId: { type: String, required: true },
   role: { type: String, enum: ["user", "assistant"], required: true },
   content: { type: String, required: true },
   language: { type: String, default: "en" },
   timestamp: { type: Date, default: Date.now },
 });
+
+chatMessageSchema.index({ userId: 1, timestamp: 1 });
 
 chatMessageSchema.set("toJSON", {
   transform(_doc, ret) {

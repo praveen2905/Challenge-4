@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { crowdApi } from "@/lib/api";
 import { motion } from "framer-motion";
@@ -104,9 +105,12 @@ export default function VolunteerPage() {
     refetchInterval: 20000,
   });
 
-  const totalAttendees = zones.reduce((s, z) => s + z.count, 0);
-  const criticalZones = zones.filter((z) => z.level === "critical");
-  const highZones = zones.filter((z) => z.level === "high");
+  const { totalAttendees, criticalZones, highZones } = useMemo(() => {
+    const total = zones.reduce((s, z) => s + z.count, 0);
+    const critical = zones.filter((z) => z.level === "critical");
+    const high = zones.filter((z) => z.level === "high");
+    return { totalAttendees: total, criticalZones: critical, highZones: high };
+  }, [zones]);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">

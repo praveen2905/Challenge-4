@@ -87,11 +87,10 @@ export default function ChatPage() {
   const { data: history = [], isLoading } = useQuery({
     queryKey: ["chat-history"],
     queryFn: chatApi.history,
-    onSuccess: (data) => setLocalMessages(data),
   });
 
   useEffect(() => {
-    if (history.length > 0 && localMessages.length === 0) {
+    if (history) {
       setLocalMessages(history);
     }
   }, [history]);
@@ -211,7 +210,7 @@ export default function ChatPage() {
           <>
             <AnimatePresence initial={false}>
               {messages.map((msg, i) => (
-                <MessageBubble key={msg._id || i} msg={msg} animate={i >= messages.length - 2} />
+                <MessageBubble key={msg.id || msg._id || i} msg={msg} animate={i >= messages.length - 2} />
               ))}
             </AnimatePresence>
             {sendMutation.isPending && (

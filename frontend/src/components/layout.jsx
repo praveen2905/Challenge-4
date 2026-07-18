@@ -134,7 +134,7 @@ export function Layout({ children }) {
             </span>
           </div>
         </header>
-        <main className="flex-1 overflow-auto bg-background p-4 md:p-6 lg:p-8">
+        <main id="main-content" tabIndex="-1" className="flex-1 overflow-auto bg-background p-4 md:p-6 lg:p-8 outline-none">
           {children}
         </main>
       </div>

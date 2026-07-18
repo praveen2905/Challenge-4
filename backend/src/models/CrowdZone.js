@@ -15,6 +15,10 @@ const crowdZoneSchema = new mongoose.Schema({
   lastUpdated: { type: Date, default: Date.now },
 });
 
+// Indexes for performance
+crowdZoneSchema.index({ zoneId: 1 }, { unique: true });
+crowdZoneSchema.index({ venueId: 1 });
+
 function computeLevel(densityPercent) {
   if (densityPercent < 50) return "low";
   if (densityPercent < 70) return "medium";
@@ -23,7 +27,7 @@ function computeLevel(densityPercent) {
 }
 
 crowdZoneSchema.pre("save", function (next) {
-  this.densityPercent = Math.round((this.count / this.capacity) * 100);
+  this.densityPercent = this.capacity > 0 ? Math.round((this.count / this.capacity) * 100) : 0;
   this.level = computeLevel(this.densityPercent);
   this.lastUpdated = new Date();
   next();

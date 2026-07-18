@@ -57,6 +57,18 @@ const aiRateLimit = rateLimit({
   },
 });
 
+// Auth endpoint rate limit: 20 req / 15 min per IP to prevent login brute-forcing & registration spam
+const authRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: "Too many authentication attempts",
+    message: "Rate limit exceeded. Please try again after 15 minutes.",
+  },
+});
+
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -66,13 +78,21 @@ app.use("/api/navigation/route", aiRateLimit);
 app.use("/api/chat/message", aiRateLimit);
 app.use("/api/decisions/query", aiRateLimit);
 
+// Apply auth rate limit to login/register
+app.use("/api/auth/register", authRateLimit);
+app.use("/api/auth/login", authRateLimit);
+
 app.use("/api", router);
 
 // Global error handler
 app.use((err, _req, res, _next) => {
   console.error("Unhandled error:", err);
   const statusCode = err.status || err.statusCode || 500;
-  res.status(statusCode).json({ error: "Internal server error", message: err.message });
+  const isProduction = process.env.NODE_ENV === "production";
+  const message = (statusCode === 500 && isProduction)
+    ? "An unexpected error occurred on the server."
+    : err.message;
+  res.status(statusCode).json({ error: statusCode === 500 ? "Internal server error" : "Error", message });
 });
 
 // 404 catch-all for unmatched routes

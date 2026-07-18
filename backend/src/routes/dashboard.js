@@ -1,3 +1,9 @@
+/**
+ * Dashboard Routes
+ *
+ * Aggregated statistics, activity feed, and crowd trend data for the
+ * operations dashboard. All endpoints require authentication.
+ */
 import { Router } from "express";
 import { User } from "../models/User.js";
 import { CrowdZone } from "../models/CrowdZone.js";
@@ -5,11 +11,15 @@ import { Alert } from "../models/Alert.js";
 import { ChatMessage } from "../models/ChatMessage.js";
 import { ActivityLog } from "../models/ActivityLog.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = Router();
 
-router.get("/stats", authenticate, async (_req, res) => {
-  try {
+/** GET /stats — Aggregate venue-wide operational statistics. */
+router.get(
+  "/stats",
+  authenticate,
+  asyncHandler(async (_req, res) => {
     const [zones, alerts, volunteers, chatSessions] = await Promise.all([
       CrowdZone.find({}, "zoneId count capacity level densityPercent"),
       Alert.find({ status: "active" }, "id status severity"),
@@ -18,7 +28,6 @@ router.get("/stats", authenticate, async (_req, res) => {
     ]);
 
     const totalAttendees = zones.reduce((sum, z) => sum + z.count, 0);
-    const activeAlerts = alerts.length;
     const zonesAtCapacity = zones.filter(
       (z) => z.level === "high" || z.level === "critical"
     ).length;
@@ -31,7 +40,7 @@ router.get("/stats", authenticate, async (_req, res) => {
 
     res.json({
       totalAttendees,
-      activeAlerts,
+      activeAlerts: alerts.length,
       zonesAtCapacity,
       avgDensity,
       totalZones: zones.length,
@@ -39,24 +48,32 @@ router.get("/stats", authenticate, async (_req, res) => {
       activeVolunteers: volunteers,
       chatSessions: chatSessions.length,
     });
-  } catch (err) {
-    res.status(500).json({ error: "Server error", message: err.message });
-  }
-});
+  })
+);
 
-router.get("/activity", authenticate, async (_req, res) => {
-  try {
-    const activities = await ActivityLog.find({}, "type message zone severity timestamp")
+/** GET /activity — Return the 20 most recent activity log entries. */
+router.get(
+  "/activity",
+  authenticate,
+  asyncHandler(async (_req, res) => {
+    const activities = await ActivityLog.find(
+      {},
+      "type message zone severity timestamp"
+    )
       .sort({ timestamp: -1 })
       .limit(20);
     res.json(activities.map((a) => a.toJSON()));
-  } catch (err) {
-    res.status(500).json({ error: "Server error", message: err.message });
-  }
-});
+  })
+);
 
-router.get("/crowd-trend", authenticate, async (_req, res) => {
-  try {
+/**
+ * GET /crowd-trend — Generate a simulated time-series crowd trend.
+ * Uses current zone data as the baseline and projects backwards.
+ */
+router.get(
+  "/crowd-trend",
+  authenticate,
+  asyncHandler(async (_req, res) => {
     const zones = await CrowdZone.find();
     const totalCapacity = zones.reduce((sum, z) => sum + z.capacity, 0);
     const currentCount = zones.reduce((sum, z) => sum + z.count, 0);
@@ -83,6 +100,7 @@ router.get("/crowd-trend", authenticate, async (_req, res) => {
       };
     });
 
+    // Snap the last data point to current real values
     const last = trend[trend.length - 1];
     last.totalCount = currentCount;
     last.avgDensity =
@@ -90,9 +108,7 @@ router.get("/crowd-trend", authenticate, async (_req, res) => {
     last.activeAlerts = activeAlerts;
 
     res.json(trend);
-  } catch (err) {
-    res.status(500).json({ error: "Server error", message: err.message });
-  }
-});
+  })
+);
 
 export default router;

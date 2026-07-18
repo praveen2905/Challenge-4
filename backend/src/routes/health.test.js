@@ -1,12 +1,16 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import app from "../app.js";
-import { connectDB } from "../config/db.js";
+import { connectDB, disconnectDB } from "../config/db.js";
 
 // MONGODB_URI is set by globalSetup.js (shared MongoMemoryServer)
 beforeAll(async () => {
   await connectDB();
 }, 60000);
+
+afterAll(async () => {
+  await disconnectDB();
+});
 
 describe("GET /api/health", () => {
   it("should return 200 with status ok", async () => {

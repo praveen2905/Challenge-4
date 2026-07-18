@@ -31,9 +31,13 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (candidate) {
-  const user = await User.findById(this._id).select("+password");
-  if (!user) return false;
-  return bcrypt.compare(candidate, user.password);
+  let password = this.password;
+  if (!password) {
+    const user = await User.findById(this._id).select("+password");
+    if (!user) return false;
+    password = user.password;
+  }
+  return bcrypt.compare(candidate, password);
 };
 
 // Ensure password is never leaked via toJSON

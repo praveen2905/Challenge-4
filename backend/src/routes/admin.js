@@ -4,6 +4,7 @@ import { Venue } from "../models/Venue.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { authorize } from "../middlewares/authorize.js";
 import { UpdateUserBody, CreateVenueBody } from "../utils/validation.js";
+import { createVenueHandler } from "./venues.js";
 
 const router = Router();
 
@@ -65,20 +66,7 @@ router.post(
   "/venues",
   authenticate,
   authorize("admin"),
-  async (req, res) => {
-    try {
-      const parsed = CreateVenueBody.safeParse(req.body);
-      if (!parsed.success) {
-        return res
-          .status(400)
-          .json({ error: "Validation error", message: parsed.error.message });
-      }
-      const venue = await Venue.create(parsed.data);
-      res.status(201).json(venue.toJSON());
-    } catch (err) {
-      res.status(500).json({ error: "Server error", message: err.message });
-    }
-  }
+  createVenueHandler
 );
 
 export default router;

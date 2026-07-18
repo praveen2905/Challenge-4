@@ -1,13 +1,17 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, afterAll } from "vitest";
 import request from "supertest";
 import app from "../app.js";
-import { connectDB } from "../config/db.js";
+import { connectDB, disconnectDB } from "../config/db.js";
 import { User } from "../models/User.js";
 
 // MONGODB_URI is set by globalSetup.js (shared MongoMemoryServer)
 beforeAll(async () => {
   await connectDB();
 }, 60000);
+
+afterAll(async () => {
+  await disconnectDB();
+});
 
 beforeEach(async () => {
   // Clean up test users between tests to avoid duplicate email conflicts

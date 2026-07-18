@@ -1,13 +1,22 @@
+/**
+ * Authentication Routes
+ *
+ * Handles user registration, login, profile retrieval, and logout.
+ * Passwords are hashed via bcrypt in the User model pre-save hook.
+ */
 import { Router } from "express";
 import { User } from "../models/User.js";
 import { ActivityLog } from "../models/ActivityLog.js";
 import { authenticate, generateToken } from "../middlewares/authenticate.js";
 import { RegisterUserBody, LoginUserBody } from "../utils/validation.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = Router();
 
-router.post("/register", async (req, res) => {
-  try {
+/** POST /register — Create a new user account and return a JWT. */
+router.post(
+  "/register",
+  asyncHandler(async (req, res) => {
     const parsed = RegisterUserBody.safeParse(req.body);
     if (!parsed.success) {
       return res
@@ -41,13 +50,13 @@ router.post("/register", async (req, res) => {
     });
 
     res.status(201).json({ token, user: user.toJSON() });
-  } catch (err) {
-    res.status(500).json({ error: "Server error", message: err.message });
-  }
-});
+  })
+);
 
-router.post("/login", async (req, res) => {
-  try {
+/** POST /login — Authenticate with email/password and return a JWT. */
+router.post(
+  "/login",
+  asyncHandler(async (req, res) => {
     const parsed = LoginUserBody.safeParse(req.body);
     if (!parsed.success) {
       return res
@@ -68,23 +77,23 @@ router.post("/login", async (req, res) => {
       user.name
     );
     res.json({ token, user: user.toJSON() });
-  } catch (err) {
-    res.status(500).json({ error: "Server error", message: err.message });
-  }
-});
+  })
+);
 
-router.get("/me", authenticate, async (req, res) => {
-  try {
+/** GET /me — Return the currently authenticated user's profile. */
+router.get(
+  "/me",
+  authenticate,
+  asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
     res.json(user.toJSON());
-  } catch (err) {
-    res.status(500).json({ error: "Server error", message: err.message });
-  }
-});
+  })
+);
 
+/** POST /logout — Stateless logout acknowledgement (JWT is client-side). */
 router.post("/logout", authenticate, (_req, res) => {
   res.json({ message: "Logged out successfully" });
 });

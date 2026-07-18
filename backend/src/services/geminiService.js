@@ -6,6 +6,19 @@ function getFallbackOrThrow(message) {
   return message;
 }
 
+function cleanAndParseJSON(text) {
+  let cleaned = text.trim();
+  if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/, "");
+  }
+  cleaned = cleaned.trim();
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error("No JSON object found in response");
+  }
+  return JSON.parse(jsonMatch[0]);
+}
+
 export async function analyzeCrowd(input) {
   const ai = getGeminiClient();
 
@@ -54,10 +67,8 @@ Respond ONLY with a valid JSON object (no markdown) with this structure:
   try {
     const model = ai.getGenerativeModel({ model: MODEL });
     const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON in response");
-    const parsed = JSON.parse(jsonMatch[0]);
+    const text = result.response.text();
+    const parsed = cleanAndParseJSON(text);
     return { ...parsed, aiPowered: true };
   } catch (err) {
     console.error("Gemini analyzeCrowd error:", err);
@@ -140,10 +151,8 @@ Generate practical step-by-step navigation instructions. Respond ONLY with valid
   try {
     const model = ai.getGenerativeModel({ model: MODEL });
     const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON in response");
-    const parsed = JSON.parse(jsonMatch[0]);
+    const text = result.response.text();
+    const parsed = cleanAndParseJSON(text);
     return { ...parsed, crowdWarnings: input.crowdWarnings, aiPowered: true };
   } catch (err) {
     console.error("Gemini generateRoute error:", err);
@@ -255,10 +264,8 @@ Respond ONLY with valid JSON (no markdown):
   try {
     const model = ai.getGenerativeModel({ model: MODEL });
     const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON in response");
-    const parsed = JSON.parse(jsonMatch[0]);
+    const text = result.response.text();
+    const parsed = cleanAndParseJSON(text);
     return { ...parsed, aiPowered: true };
   } catch (err) {
     console.error("Gemini queryDecision error:", err);

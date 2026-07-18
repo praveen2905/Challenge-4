@@ -168,7 +168,7 @@ function AlertCard({ alert, onResolve }) {
           size="sm"
           variant="ghost"
           className="shrink-0 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
-          onClick={() => onResolve(alert._id)}
+          onClick={() => onResolve(alert.id || alert._id)}
         >
           <CheckCircle2 className="h-4 w-4" />
         </Button>
@@ -218,7 +218,7 @@ export default function CrowdPage() {
   });
 
   const handleAnalyze = () => {
-    const venueId = venues[0]?._id || "default";
+    const venueId = venues[0]?.id || venues[0]?._id || "default";
     analyzeMutation.mutate({ venueId });
   };
 
@@ -380,7 +380,7 @@ export default function CrowdPage() {
               <AnimatePresence>
                 {activeAlerts.map((a) => (
                   <AlertCard
-                    key={a._id}
+                    key={a.id || a._id}
                     alert={a}
                     onResolve={(id) => resolveMutation.mutate(id)}
                   />
@@ -402,7 +402,7 @@ export default function CrowdPage() {
               <p className="text-sm text-muted-foreground">No resolved alerts</p>
             ) : (
               resolvedAlerts.map((a) => (
-                <AlertCard key={a._id} alert={a} onResolve={() => {}} />
+                <AlertCard key={a.id || a._id} alert={a} onResolve={() => {}} />
               ))
             )}
           </motion.div>

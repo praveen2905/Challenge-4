@@ -2,8 +2,9 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
 
 const JWT_SECRET = process.env.SESSION_SECRET || "venueiq_super_secret_session_key";
-if (process.env.NODE_ENV === "production" && JWT_SECRET === "venueiq_super_secret_session_key") {
-  console.warn("⚠️ SECURITY WARNING: Using fallback JWT secret in production! Please define SESSION_SECRET.");
+if (process.env.NODE_ENV === "production" && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET === "venueiq_super_secret_session_key")) {
+  console.error("❌ FATAL SECURITY ERROR: SESSION_SECRET is not defined in production!");
+  throw new Error("SESSION_SECRET must be defined in production environment.");
 }
 const JWT_EXPIRY = process.env.JWT_EXPIRY || "24h";
 

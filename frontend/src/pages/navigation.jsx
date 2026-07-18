@@ -137,13 +137,22 @@ export default function NavigationPage() {
     queryFn: venuesApi.list,
   });
 
-  const venueId = venues[0]?._id || "default";
+  const venueId = venues[0]?.id || venues[0]?._id || "default";
 
   const { data: mapData } = useQuery({
     queryKey: ["nav-map", venueId],
     queryFn: () => navigationApi.map(venueId),
     enabled: !!venueId && venueId !== "default",
   });
+
+  const { data: dynamicPois = [] } = useQuery({
+    queryKey: ["nav-pois"],
+    queryFn: navigationApi.pois,
+  });
+
+  const poisList = dynamicPois && dynamicPois.length > 0
+    ? Array.from(new Set(dynamicPois.map((p) => p.name)))
+    : POIS;
 
   const routeMutation = useMutation({
     mutationFn: navigationApi.route,
@@ -198,7 +207,7 @@ export default function NavigationPage() {
                   onChange={(e) => setOrigin(e.target.value)}
                   className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
                 >
-                  {POIS.map((p) => <option key={p} value={p}>{p}</option>)}
+                  {poisList.map((p) => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
 
@@ -213,7 +222,7 @@ export default function NavigationPage() {
                   onChange={(e) => setDestination(e.target.value)}
                   className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
                 >
-                  {POIS.map((p) => <option key={p} value={p}>{p}</option>)}
+                  {poisList.map((p) => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
             </div>
